@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"log"
 	"net/http"
@@ -43,10 +44,33 @@ func AboutHandler(w http.ResponseWriter, r *http.Request) {
 	renderTemplate(w, "about.page.gotmpl")
 }
 
+func write(w http.ResponseWriter, msg string) {
+	_, err := w.Write([]byte(msg)) // converted from `string` to `[]byte` type... Because we can send the browser the data by using w.Write() which accepts `[]byte` type as an argument.
+	checkError(err)
+}
+
+func divide(x, y float32) (float32, error) {
+	if y == 0 {
+		return 0, errors.New("cannot divide by zero")
+	}
+	return (x / y), nil
+}
+
+func divideHandler(w http.ResponseWriter, r *http.Request) {
+	result, err := divide(5, 0)
+	if err != nil {
+		write(w, err.Error())
+	} else {
+		output := fmt.Sprintf("5 / 0 = %.2f\n", result)
+		write(w, output) // send the formatted string to the browser by using function we created; write()
+	}
+}
+
 func main() {
 	// routing pages
 	http.HandleFunc("/", HomeHandler)
 	http.HandleFunc("/about", AboutHandler)
+	http.HandleFunc("/divide", divideHandler)
 
 	// listen to the port for incoming http requests.
 	fmt.Printf("Listening traffic at %s\n", url)
