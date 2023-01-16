@@ -20,6 +20,7 @@ func checkError(err error) {
 	}
 }
 
+// This function renders the go templates on the web browser.
 func renderTemplate(w http.ResponseWriter, tmpl string) {
 	templates := []string{
 		fmt.Sprintf("./templates/%s", tmpl),
@@ -49,17 +50,19 @@ func write(w http.ResponseWriter, msg string) {
 	checkError(err)
 }
 
+// custom function
 func divide(x, y float32) (float32, error) {
 	if y == 0 {
-		return 0, errors.New("cannot divide by zero")
+		return 0, errors.New("cannot divide by zero") // raise a new error.
 	}
-	return (x / y), nil
+	return (x / y), nil // calculated successfully, no error.
 }
 
+// Makes the calculation and send the result whenever /divide is requested.
 func divideHandler(w http.ResponseWriter, r *http.Request) {
 	result, err := divide(5, 0)
 	if err != nil {
-		write(w, err.Error())
+		write(w, err.Error()) // send the error message to the browser.
 	} else {
 		output := fmt.Sprintf("5 / 0 = %.2f\n", result)
 		write(w, output) // send the formatted string to the browser by using function we created; write()
